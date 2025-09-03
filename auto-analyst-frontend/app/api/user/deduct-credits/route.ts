@@ -19,16 +19,30 @@ export async function POST(request: NextRequest) {
     const creditsHash = await redis.hgetall(KEYS.USER_CREDITS(userId))
     
     if (!creditsHash || !creditsHash.total) {
+      const defaultCredits = 20
+      await redis.hset(KEYS.USER_CREDITS(userId), {
+        total: '20',
+        used: '0',
+        resetDate: CreditConfig.getNextResetDate(),
+        lastUpdate: new Date().toISOString()
+      })
+       return NextResponse.json({
+        success: true,
+        remaining: 20,
+        deducted: 0
+      })
+     }
       // No credits for users without subscription - require upgrade
-      return NextResponse.json({
-        success: false,
-        error: 'UPGRADE_REQUIRED',
-        message: 'Please start your trial or upgrade your plan to continue.',
-        remaining: 0,
-        needsUpgrade: true
-      }, { status: 402 }) // Payment Required status code
-    }
-    
+    //   return NextResponse.json({
+    //     success: false,
+    //     error: 'UPGRADE_REQUIRED',
+    //     message: 'Please start your trial or upgrade your plan to continue.',
+    //     remaining: 0,
+    //     needsUpgrade: true
+    //   }, { status: 402 }) // Payment Required status code
+    // 
+   
+
     // Calculate new used amount
     const total = parseInt(creditsHash.total as string)
     const currentUsed = creditsHash.used ? parseInt(creditsHash.used as string) : 0

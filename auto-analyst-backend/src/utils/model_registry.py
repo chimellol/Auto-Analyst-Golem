@@ -1,8 +1,3 @@
-"""
-Models registry for the Auto-Analyst application.
-This file serves as the single source of truth for all model information.
-"""
-
 # Model providers
 PROVIDERS = {
     "openai": "OpenAI",
@@ -14,18 +9,14 @@ PROVIDERS = {
 # Cost per 1K tokens for different models
 MODEL_COSTS = {
     "openai": {
-        "gpt-4.1": {"input": 0.002, "output": 0.008},
-        "gpt-4.1-mini": {"input": 0.0004, "output": 0.0016},
-        "gpt-4.1-nano": {"input": 0.00010, "output": 0.0004},
-        "gpt-4.5-preview": {"input": 0.075, "output": 0.15},
-        "gpt-4o": {"input": 0.0025, "output": 0.01},
-        "gpt-4o-mini": {"input": 0.00015, "output": 0.0006},  
         "o1": {"input": 0.015, "output": 0.06},  
         "o1-pro": {"input": 0.015, "output": 0.6},
         "o1-mini": {"input": 0.00011, "output": 0.00044}, 
         "o3": {"input": 0.002, "output": 0.008},
         "o3-mini": {"input": 0.00011, "output": 0.00044},
-        "gpt-3.5-turbo": {"input": 0.0005, "output": 0.0015},  
+        "gpt-5": {"input": 0.00125, "output": 0.01},         # updated real cost
+        "gpt-5-mini": {"input": 0.00025, "output": 0.002},   # updated real cost
+        "gpt-5-nano": {"input": 0.00005, "output": 0.0004},  # updated real cost
     },
     "anthropic": {
         "claude-3-5-haiku-latest": {"input": 0.00025, "output": 0.000125},
@@ -34,19 +25,12 @@ MODEL_COSTS = {
         "claude-sonnet-4-20250514": {"input": 0.003, "output": 0.015},
         "claude-3-opus-latest": {"input": 0.015, "output": 0.075},  
         "claude-opus-4-20250514": {"input": 0.015, "output": 0.075},
+        "claude-opus-4-1": {"input": 0.015, "output": 0.075},  # approximate placeholder
     },
     "groq": {
         "deepseek-r1-distill-llama-70b": {"input": 0.00075, "output": 0.00099},
-        "llama-3.3-70b-versatile": {"input": 0.00059, "output": 0.00079},
-        "llama3-8b-8192": {"input": 0.00005, "output": 0.00008},
-        "llama3-70b-8192": {"input": 0.00059, "output": 0.00079},
-        "mistral-saba-24b": {"input": 0.00079, "output": 0.00079},
-        "gemma2-9b-it": {"input": 0.0002, "output": 0.0002},
-        "qwen-qwq-32b": {"input": 0.00029, "output": 0.00039},
-        "meta-llama/llama-4-maverick-17b-128e-instruct": {"input": 0.0002, "output": 0.0006},
-        "meta-llama/llama-4-scout-17b-16e-instruct": {"input": 0.00011, "output": 0.00034},
-        "deepseek-r1-distill-qwen-32b": {"input": 0.00075, "output": 0.00099},
-        "llama-3.1-70b-versatile": {"input": 0.00059, "output": 0.00079},
+        "gpt-oss-120B": {"input": 0.00075, "output": 0.00099},
+        "gpt-oss-20B": {"input": 0.00075, "output": 0.00099}
     },
     "gemini": {
         "gemini-2.5-pro-preview-03-25": {"input": 0.00015, "output": 0.001}
@@ -60,42 +44,30 @@ MODEL_TIERS = {
         "credits": 1,
         "models": [
             "claude-3-5-haiku-latest",
-            "llama3-8b-8192",
-            "gemma2-9b-it",
-            "meta-llama/llama-4-scout-17b-16e-instruct"
+            "gpt-oss-20B"
         ]
     },
     "tier2": {
         "name": "Standard",
         "credits": 3,
         "models": [
-            "gpt-4.1-nano",
-            "gpt-4o-mini",
             "o1-mini",
             "o3-mini",
-            "qwen-qwq-32b",
-            "meta-llama/llama-4-maverick-17b-128e-instruct"
+            "gpt-5-nano"   # Added
         ]
     },
     "tier3": {
         "name": "Premium",
         "credits": 5,
         "models": [
-            "gpt-4.1",
-            "gpt-4.1-mini",
-            "gpt-4o",
             "o3",
-            "gpt-3.5-turbo",
             "claude-3-7-sonnet-latest",
             "claude-3-5-sonnet-latest",
             "claude-sonnet-4-20250514",
             "deepseek-r1-distill-llama-70b",
-            "llama-3.3-70b-versatile",
-            "llama3-70b-8192",
-            "mistral-saba-24b",
-            "deepseek-r1-distill-qwen-32b",
-            "llama-3.1-70b-versatile",
-            "gemini-2.5-pro-preview-03-25"
+            "gpt-oss-120B",
+            "gemini-2.5-pro-preview-03-25",
+            "gpt-5-mini"   # Added
         ]
     },
     "tier4": {
@@ -108,42 +80,41 @@ MODEL_TIERS = {
             "claude-3-opus-latest",
             "claude-opus-4-20250514"
         ]
+    },
+    "tier5": {  # New highest tier
+        "name": "Ultimate",
+        "credits": 50,
+        "models": [
+            "gpt-5",
+            "claude-opus-4-1"
+        ]
     }
 }
 
 # Model metadata (display name, context window, etc.)
 MODEL_METADATA = {
     # OpenAI
-    "gpt-4.1": {"display_name": "GPT-4.1", "context_window": 128000},
-    "gpt-4.1-mini": {"display_name": "GPT-4.1 Mini", "context_window": 128000},
-    "gpt-4.1-nano": {"display_name": "GPT-4.1 Nano", "context_window": 128000},
-    "gpt-4o": {"display_name": "GPT-4o", "context_window": 128000},
-    "gpt-4.5-preview": {"display_name": "GPT-4.5 Preview", "context_window": 128000},
-    "gpt-4o-mini": {"display_name": "GPT-4o Mini", "context_window": 128000},
-    "gpt-3.5-turbo": {"display_name": "GPT-3.5 Turbo", "context_window": 16385},
     "o1": {"display_name": "o1", "context_window": 128000},
     "o1-pro": {"display_name": "o1 Pro", "context_window": 128000},
     "o1-mini": {"display_name": "o1 Mini", "context_window": 128000},
     "o3": {"display_name": "o3", "context_window": 128000},
     "o3-mini": {"display_name": "o3 Mini", "context_window": 128000},
+    "gpt-5": {"display_name": "GPT-5", "context_window": 400000},
+    "gpt-5-mini": {"display_name": "GPT-5 Mini", "context_window": 150000},  # estimated
+    "gpt-5-nano": {"display_name": "GPT-5 Nano", "context_window": 64000},    # estimated
+
     # Anthropic
     "claude-3-opus-latest": {"display_name": "Claude 3 Opus", "context_window": 200000},
     "claude-3-7-sonnet-latest": {"display_name": "Claude 3.7 Sonnet", "context_window": 200000},
     "claude-3-5-sonnet-latest": {"display_name": "Claude 3.5 Sonnet", "context_window": 200000},
     "claude-3-5-haiku-latest": {"display_name": "Claude 3.5 Haiku", "context_window": 200000},
-    
+    "claude-opus-4-1": {"display_name": "Claude Opus 4.1", "context_window": 200000},
+
     # GROQ
     "deepseek-r1-distill-llama-70b": {"display_name": "DeepSeek R1 Distill Llama 70b", "context_window": 32768},
-    "llama-3.3-70b-versatile": {"display_name": "Llama 3.3 70b", "context_window": 8192},
-    "llama3-8b-8192": {"display_name": "Llama 3 8b", "context_window": 8192},
-    "llama3-70b-8192": {"display_name": "Llama 3 70b", "context_window": 8192},
-    "mistral-saba-24b": {"display_name": "Mistral Saba 24b", "context_window": 32768},
-    "gemma2-9b-it": {"display_name": "Gemma 2 9b", "context_window": 8192},
-    "qwen-qwq-32b": {"display_name": "Qwen QWQ 32b | Alibaba", "context_window": 32768},
-    "meta-llama/llama-4-maverick-17b-128e-instruct": {"display_name": "Llama 4 Maverick 17b", "context_window": 128000},
-    "meta-llama/llama-4-scout-17b-16e-instruct": {"display_name": "Llama 4 Scout 17b", "context_window": 16000},
-    "llama-3.1-70b-versatile": {"display_name": "Llama 3.1 70b Versatile", "context_window": 8192},
-    
+    "gpt-oss-120B": {"display_name": "OpenAI gpt oss 120B", "context_window": 128000},
+    "gpt-oss-20B": {"display_name": "OpenAI gpt oss 20B", "context_window": 128000},
+
     # Gemini
     "gemini-2.5-pro-preview-03-25": {"display_name": "Gemini 2.5 Pro", "context_window": 1000000},
 }

@@ -213,14 +213,26 @@ async def update_model_settings(
         session_state = app_state.get_session_state(session_id)
         
         # Create the model config
-        model_config = {
-            "provider": settings.provider,
-            "model": settings.model,
-            "api_key": settings.api_key,
-            "temperature": settings.temperature,
-            "max_tokens": settings.max_tokens
-        }
+        if 'gpt-5' in str(settings.model):
+            model_config = {
+                "provider": settings.provider,
+                "model": settings.model,
+                "api_key": settings.api_key,
+                "temperature": settings.temperature,
+                "max_tokens":None,
+                "max_completion_tokens": 10000
+            }
+            
         
+        else:
+            model_config = {
+                "provider": settings.provider,
+                "model": settings.model,
+                "api_key": settings.api_key,
+                "temperature": settings.temperature,
+                "max_tokens": settings.max_tokens
+            }
+            
         # Update only the session's model config
         session_state["model_config"] = model_config
         
@@ -257,14 +269,24 @@ async def update_model_settings(
                 temperature=settings.temperature,
                 max_tokens=settings.max_tokens
             )
-        else:  # OpenAI is the default
+        elif settings.provider.lower() == "openai":  # OpenAI is the default
             logger.log_message(f"OpenAI Model: {settings.model}", level=logging.INFO)
-            lm = dspy.LM(
-                model=f"openai/{settings.model}",
-                api_key=settings.api_key,
-                temperature=settings.temperature,
-                max_tokens=settings.max_tokens
-            )
+            print(settings.model.lower())
+            if 'gpt-5' in settings.model.lower():
+                lm = dspy.LM(
+                    model=f"openai/{settings.model}",
+                    api_key=settings.api_key,
+                    temperature=settings.temperature,
+                    max_tokens = None,
+                    max_completion_tokens= 10000
+                )
+            else:
+                lm = dspy.LM(
+                    model=f"openai/{settings.model}",
+                    api_key=settings.api_key,
+                    temperature=settings.temperature,
+                    max_tokens=settings.max_tokens
+                )
         
 
         # Test the model configuration without setting it globally
@@ -310,7 +332,7 @@ async def get_model_settings(
     # Use values from model_config with fallbacks to defaults
     return {
         "provider": model_config.get("provider", "openai"),
-        "model": model_config.get("model", "gpt-4o-mini"),
+        "model": model_config.get("model", "o1"),
         "hasCustomKey": bool(model_config.get("api_key")) or bool(os.getenv("CUSTOM_API_KEY")),
         "temperature": model_config.get("temperature", 0.7),
         "maxTokens": model_config.get("max_tokens", 6000)
